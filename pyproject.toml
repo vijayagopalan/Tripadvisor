@@ -1,0 +1,17 @@
+[project]
+name = "tripadvisor"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "airportsdata>=20261103",
+    "fastapi>=0.162.0",
+    "langchain>=1.4.8",
+    "langchain-community>=0.4.2",
+    "langchain-google-genai>=4.4.2",
+    "langgraph>=1.2.19",
+    "psycopg[binary,pool]>=3.3.8",
+    "requests>=2.34.2",
+    "uvicorn>=0.54.0",
+]
