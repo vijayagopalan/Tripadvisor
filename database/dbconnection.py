@@ -11,8 +11,6 @@ async def lifespan(app: FastAPI):
     db_url = os.getenv("DB_URL")
     if not db_url:
         raise RuntimeError("DB_URL environment variable is not set")
-
-    # Only create ONE pool, and let `async with` open and close it
     async with AsyncConnectionPool(conninfo=db_url) as p:
-        pool = p
+        app.state.pool = p
         yield
