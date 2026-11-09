@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Request
 
-from database.dbqueries import fetch_table_data
+from database.dbqueries import fetch_transaction_data, create_transaction
 
 router = APIRouter()
 
 
-@router.get("/getsampledata")
+@router.get("/gettransactiondata")
 async def get_sample_table(request: Request):
     pool = request.app.state.pool
-    result = await fetch_table_data(pool, table_name="Sample")
+    result = await fetch_transaction_data(pool)
     return result
 
-@router.get("/getflight")
+@router.get("/createtransaction")
 async def get_flights(request: Request):
     pool = request.app.state.pool
-    result = await fetch_table_data(pool, table_name="Sample")
+    message = request.body.message
+    type =  request.body.type
+    result = await create_transaction(pool,message,type)
     return result

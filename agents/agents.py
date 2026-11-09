@@ -17,10 +17,10 @@ llm = ChatGoogleGenerativeAI(
 
 def flight_agent(state: TravelState):
     query = state["user_query"]
-    flight_data = tavily_airport_search
+    flight_data = tavily_airport_search(query)
 
     return {
-        "fligh_results":flight_data,
+        "flight_results":str(flight_data) ,
         "messages": [
            AIMessage(content = "flight results fetched") 
         ]

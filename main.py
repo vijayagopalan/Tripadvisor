@@ -1,13 +1,15 @@
 import sys
 from dotenv import load_dotenv
 load_dotenv()
-from fastapi import FastAPI
+import requests
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import uvicorn
 from database.dbconnection import lifespan
 from flightsapi.flights_api import router as flights_router
 from pydantic import BaseModel
 from agents.agents import travel_agent
+from database.dbqueries import create_transaction
 
 app = FastAPI(lifespan=lifespan)
 
@@ -25,13 +27,18 @@ async def healthz():
 
 
 @app.post("/api/travel")
-async def travel_planner(request_data:Travel_Request):
+async def travel_planner(request: Request,request_data:Travel_Request):
     try:
         user_message = request_data.message.strip()
+        pool = getattr(request.app.state, "pool", None)
+        if pool is not None:
+            await create_transaction(pool, user_message, "HUMAN")
         result = travel_agent(
             user_input=user_message,
             thread_id=request_data.thread_id
         )
+        if pool is not None:
+            await create_transaction(pool, result["answer"], "AGENT")
         return JSONResponse(
             content={
                 "success": True,
