@@ -1,10 +1,10 @@
 import sys
 from dotenv import load_dotenv
 load_dotenv()
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 import uvicorn
 from database.dbconnection import lifespan
-from database.dbqueries import fetch_table_data
+from flightsapi.flights_api import router as flights_router
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 app = FastAPI(lifespan=lifespan)
@@ -14,16 +14,12 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.7,
 )
 
+app.include_router(flights_router)
+
+
 @app.get("/")
 async def healthz():
     return "healthy upstream"
-
-
-@app.get("/getdata")
-async def get_sample_table(request: Request):
-    pool = request.app.state.pool
-    result = await fetch_table_data(pool, table_name="Sample")
-    return result
 
 if __name__ == "__main__":
     loop_setting = "asyncio:SelectorEventLoop" if sys.platform == "win32" else "auto"

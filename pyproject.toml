@@ -13,5 +13,6 @@ dependencies = [
     "langgraph>=1.2.19",
     "psycopg[binary,pool]>=3.3.8",
     "requests>=2.34.2",
+    "tavily>=1.1.0",
     "uvicorn>=0.54.0",
 ]
