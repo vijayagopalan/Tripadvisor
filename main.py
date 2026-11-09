@@ -2,17 +2,19 @@ import sys
 from dotenv import load_dotenv
 load_dotenv()
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 import uvicorn
 from database.dbconnection import lifespan
 from flightsapi.flights_api import router as flights_router
-from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import BaseModel
+from agents.agents import travel_agent
 
 app = FastAPI(lifespan=lifespan)
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.7,
-)
+class Travel_Request(BaseModel):
+    message : str
+    thread_id : str | None = None
+
 
 app.include_router(flights_router)
 
@@ -20,6 +22,31 @@ app.include_router(flights_router)
 @app.get("/")
 async def healthz():
     return "healthy upstream"
+
+
+@app.post("/api/travel")
+async def travel_planner(request_data:Travel_Request):
+    try:
+        user_message = request_data.message.strip()
+        result = travel_agent(
+            user_input=user_message,
+            thread_id=request_data.thread_id
+        )
+        return JSONResponse(
+            content={
+                "success": True,
+                "thread_id": result["thread_id"],
+                "answer": result["answer"],
+                "flight_results": result["flight_results"],
+                "hotel_results": result["hotel_results"],
+                "itinerary": result["itinerary"],
+                "llm_calls": result["llm_calls"],
+            }
+        )
+    except Exception as e:
+        print("Error ", e)
+
+
 
 if __name__ == "__main__":
     loop_setting = "asyncio:SelectorEventLoop" if sys.platform == "win32" else "auto"
