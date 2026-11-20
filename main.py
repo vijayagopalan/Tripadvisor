@@ -10,6 +10,7 @@ from flightsapi.flights_api import router as flights_router
 from pydantic import BaseModel
 from agents.agents import travel_agent
 from database.dbqueries import create_transaction
+from llm import llm
 
 app = FastAPI(lifespan=lifespan)
 

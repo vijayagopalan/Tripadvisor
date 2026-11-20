@@ -5,22 +5,21 @@ from langchain_core.messages import (
     HumanMessage
 )
 from tools.tavily_tool import tavily_search, tavily_airport_search
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0.7,
-)
+from tools.flight_tool import flightapp
+from llm import llm
 
 
 
 def flight_agent(state: TravelState):
     query = state["user_query"]
-    flight_data = tavily_airport_search(query)
+    initial_state = {
+        "messages": [HumanMessage(content=F" get teh avilabel flights for user query = {query}")]
+    }
+    result = flightapp.invoke(initial_state)
 
     return {
-        "flight_results":str(flight_data) ,
+        "flight_results":result["messages"][-1].content ,
         "messages": [
            AIMessage(content = "flight results fetched") 
         ]
@@ -93,7 +92,7 @@ def final_agent(state: TravelState):
         SystemMessage(content="You are a professional AI travel booking assistant."),
         HumanMessage(content=final_prompt)
     ])
-
+    
     return {
         "messages": [response]
     }
