@@ -1,7 +1,6 @@
 import sys
 from dotenv import load_dotenv
 load_dotenv()
-import requests
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import uvicorn

@@ -4,7 +4,7 @@ from langchain_core.messages import (
     SystemMessage,
     HumanMessage
 )
-from tools.tavily_tool import tavily_search, tavily_airport_search
+from tools.tavily_tool import tavily_search
 from langgraph.graph import StateGraph, START, END
 from tools.flight_tool import flightapp
 from llm import llm
@@ -19,7 +19,7 @@ def flight_agent(state: TravelState):
     result = flightapp.invoke(initial_state)
 
     return {
-        "flight_results":result["messages"][-1].content ,
+        "flight_results":result["messages"][-1].content.text ,
         "messages": [
            AIMessage(content = "flight results fetched") 
         ]

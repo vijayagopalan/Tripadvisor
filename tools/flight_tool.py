@@ -35,9 +35,19 @@ def get_IATA_code(departure:str,destination:str):
         "destination" : tavily_client.search(f"iata code for ${destination} city")
     }
 
+
+@tool
+def get_location(departure:str,destination:str):
+    """identify the depature and destination location from user query"""
+    return {
+            "departure" :departure,
+            "destination" :destination
+        }
+
 @tool
 def get_flights_data(dep_iata:str,arr_iata:str):
-    """Get the available flights for the trip using iata code of the location of departure and arraival"""
+    """Get the available flights for the trip using iata code of the location of departure and arraival 
+   """
 
     url = "https://api.apilayer.net/aviationstack/v1/flights"
     if not access_key:
@@ -53,11 +63,11 @@ def get_flights_data(dep_iata:str,arr_iata:str):
 
     response = requests.get(url, params=params, timeout=30)
     response.raise_for_status()
-    print(response.json())
-    return response.json()
+    data = response.json()
+    return data["data"]
 
 
-tools = [get_weather,get_IATA_code,get_flights_data]
+tools = [get_weather,get_IATA_code,get_flights_data,get_location]
 
 
 llm_with_tools = llm.bind_tools(tools)
